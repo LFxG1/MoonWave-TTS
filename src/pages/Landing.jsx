@@ -7,7 +7,12 @@ import {
   FileText,
   FolderOpen,
   Settings2,
-  Sparkles,
+  ChevronLeft,
+  CircleDot,
+  KeyRound,
+  UploadCloud,
+  FileAudio,
+  Code2,
 } from 'lucide-react';
 import Logo from '../components/Logo.jsx';
 
@@ -64,10 +69,11 @@ function MoonscapeBackdrop() {
   );
 }
 
+const labelClass = 'mb-1 block text-[9px] font-medium uppercase tracking-wider text-slate-500';
+
 /**
- * Static, non-interactive snapshot of the Voice Studio shown under the hero
- * description (the "screenshot under the description"). Light frosted glass so
- * it lifts off the dark painting. No handlers — purely visual.
+ * Static snapshot of the Voice Studio — mirrors the real layout at desktop
+ * width (top bar, sidebar, TTS panel, details column). Non-interactive.
  */
 function StudioPreview() {
   const navItems = [
@@ -78,122 +84,202 @@ function StudioPreview() {
     { label: 'Settings', icon: Settings2 },
   ];
 
-  // Deterministic waveform heights (no randomness on render).
-  const bars = [28, 46, 62, 40, 72, 54, 84, 60, 38, 70, 50, 80, 44, 66, 34, 76, 52, 64, 30, 58];
-
-  const details = [
-    ['Status', 'Idle'],
-    ['Characters', '0'],
-    ['Duration', '00:00'],
-    ['Voice', 'Aria · Neural'],
-    ['Format', 'MP3'],
-  ];
-
   return (
-    <div className="overflow-hidden rounded-[1.75rem] border border-white/60 bg-white/85 text-slate-700 shadow-[0_40px_90px_-30px_rgba(5,12,40,0.75)] backdrop-blur-xl">
-      {/* Window top bar */}
-      <div className="flex items-center justify-between border-b border-slate-200/70 bg-white/60 px-5 py-3">
-        <div className="flex items-center gap-2.5">
-          <span className="grid h-7 w-7 place-items-center rounded-lg bg-moon-gradient text-white shadow-sm">
-            <svg width="15" height="15" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-              <path d="M19 3.5a9 9 0 1 0 7.5 14 7 7 0 1 1-7.5-14Z" fill="#ffffff" />
-              <path
-                d="M4 23.5c2-2.4 4-2.4 6 0s4 2.4 6 0 4-2.4 6 0 4 2.4 6 0"
-                stroke="#ffffff"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                fill="none"
-              />
-            </svg>
-          </span>
-          <span className="font-display text-sm font-semibold text-slate-800">
-            MoonWave <span className="font-normal text-slate-400">Studio</span>
-          </span>
+    <div
+      aria-hidden="true"
+      className="pointer-events-none overflow-hidden rounded-2xl border border-slate-200/70 bg-[#eef2fc] text-left text-slate-700 shadow-[0_40px_90px_-30px_rgba(5,12,40,0.75)]"
+    >
+      {/* Top bar — matches TopBar.jsx */}
+      <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 bg-white/70 px-4 py-2.5 backdrop-blur-xl">
+        <div className="flex items-center gap-3">
+          <Logo size="sm" subtitle="Studio" tone="dark" />
+          <span className="hidden h-5 w-px bg-slate-200 sm:block" />
+          <div className="hidden items-center gap-1.5 rounded-full border border-slate-200 bg-white/70 px-2.5 py-0.5 text-[10px] text-slate-500 sm:flex">
+            <CircleDot size={11} className="text-[#5b8def]" />
+            Project · Untitled
+          </div>
         </div>
-        <div className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-600">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-          Idle
+        <div className="flex items-center gap-2">
+          <span className="flex items-center gap-1.5 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-600">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+            Offline
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white/70 px-2 py-1 text-[10px] text-slate-600">
+            <ChevronLeft size={12} />
+            Exit
+          </span>
         </div>
       </div>
 
-      {/* Body: sidebar · editor · details */}
-      <div className="grid grid-cols-[1fr] md:grid-cols-[150px_1fr] lg:grid-cols-[160px_1fr_168px]">
-        {/* Sidebar */}
-        <nav className="hidden flex-col gap-1 border-r border-slate-200/70 bg-white/40 p-3 md:flex">
-          {navItems.map(({ label, icon: Icon, active }) => (
-            <div
-              key={label}
-              className={`flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[12.5px] font-medium ${
-                active ? 'bg-[#eaf1ff] text-[#3068d6]' : 'text-slate-500'
-              }`}
-            >
-              <span
-                className={`grid h-6 w-6 place-items-center rounded-lg ${
-                  active
-                    ? 'bg-gradient-to-br from-[#6f9bf0] to-[#9bc0ff] text-white'
-                    : 'bg-slate-100 text-slate-400'
+      <div className="flex">
+        {/* Sidebar — matches Sidebar.jsx */}
+        <aside className="hidden w-[148px] shrink-0 flex-col justify-between border-r border-slate-200/70 bg-white/55 p-3 backdrop-blur-xl md:flex">
+          <nav className="flex flex-col gap-0.5">
+            {navItems.map(({ label, icon: Icon, active }) => (
+              <div
+                key={label}
+                className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-[10px] font-medium ${
+                  active ? 'bg-[#eaf1ff] text-[#3068d6]' : 'text-slate-500'
                 }`}
               >
-                <Icon size={13} strokeWidth={2.1} />
-              </span>
-              {label}
-            </div>
-          ))}
-        </nav>
-
-        {/* Main editor */}
-        <div className="p-5">
-          <h3 className="font-display text-base font-semibold text-slate-800">Voice Studio</h3>
-          <p className="mt-0.5 text-[12px] text-slate-400">
-            Type or upload text to generate lifelike speech.
-          </p>
-
-          <div className="mt-4 rounded-xl border border-slate-200 bg-white/70 p-3.5">
-            <p className="text-[12.5px] leading-relaxed text-slate-400">
-              The night is calm, the stars are bright, and the journey ahead is filled with
-              endless possibilities…
-            </p>
-            <div className="mt-3 flex items-end gap-[3px]" aria-hidden="true">
-              {bars.map((h, i) => (
                 <span
-                  key={i}
-                  className="w-[3px] rounded-full bg-gradient-to-t from-[#7aa8ff] to-[#9fe0ea]"
-                  style={{ height: `${h * 0.42}px` }}
-                />
-              ))}
+                  className={`grid h-6 w-6 place-items-center rounded-md ${
+                    active
+                      ? 'bg-moon-gradient text-white shadow-[0_4px_12px_-4px_rgba(91,141,239,0.7)]'
+                      : 'bg-slate-100 text-slate-400'
+                  }`}
+                >
+                  <Icon size={12} strokeWidth={2.1} />
+                </span>
+                <span className="truncate">{label}</span>
+              </div>
+            ))}
+          </nav>
+          <div className="mt-3 rounded-lg border border-slate-200 bg-white/70 p-2">
+            <p className="text-[9px] font-medium text-slate-700">Workspace</p>
+            <p className="text-[10px] text-slate-500">Personal Studio</p>
+            <div className="mt-2 flex items-center gap-1.5 border-t border-slate-200 pt-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+              <span className="text-[9px] text-slate-500">Azure Speech · Not connected</span>
             </div>
-          </div>
-
-          <div className="mt-3 grid grid-cols-2 gap-2.5">
-            <div className="rounded-lg border border-slate-200 bg-white/70 px-3 py-2 text-[11.5px] text-slate-500">
-              <span className="block text-[10px] uppercase tracking-wide text-slate-400">Voice</span>
-              Aria · Female
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-white/70 px-3 py-2 text-[11.5px] text-slate-500">
-              <span className="block text-[10px] uppercase tracking-wide text-slate-400">Language</span>
-              English (US)
-            </div>
-          </div>
-
-          <div className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#5b8def] to-[#84b3ff] py-2.5 text-[13px] font-semibold text-white shadow-[0_10px_24px_-8px_rgba(91,141,239,0.8)]">
-            <Sparkles size={15} />
-            Generate Voice
-          </div>
-        </div>
-
-        {/* Details panel */}
-        <aside className="hidden flex-col gap-2.5 border-l border-slate-200/70 bg-white/40 p-4 lg:flex">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Details</p>
-          {details.map(([k, v]) => (
-            <div key={k} className="flex items-center justify-between text-[11.5px]">
-              <span className="text-slate-400">{k}</span>
-              <span className="font-medium text-slate-600">{v}</span>
-            </div>
-          ))}
-          <div className="mt-1 rounded-lg bg-[#f3f7ff] px-3 py-2 text-[10.5px] leading-snug text-[#5b7fc4]">
-            Clips render locally and stay on your device.
           </div>
         </aside>
+
+        {/* Main + details — matches Studio.jsx TTS layout */}
+        <div className="flex min-w-0 flex-1 gap-4 p-4">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-display text-sm font-semibold text-slate-800">Voice Studio</h3>
+            <p className="mt-0.5 text-[10px] text-slate-500">
+              Type or upload text to generate lifelike speech with Azure AI.
+            </p>
+
+            <div className="glass mt-3 rounded-xl p-3">
+              <p className={labelClass}>Text Editor</p>
+              <div className="rounded-lg border border-slate-200 bg-white/80 p-2.5 text-[10px] leading-relaxed text-slate-400">
+                The night is calm, the stars are bright, and the journey ahead is filled with
+                endless possibilities…
+              </div>
+              <p className="mt-1 text-right text-[9px] text-slate-400">0 / 5,000</p>
+              <div className="mt-2 flex flex-col items-center gap-1 rounded-lg border border-dashed border-slate-300 bg-white/50 px-3 py-3">
+                <UploadCloud size={14} className="text-[#5b8def]" />
+                <span className="text-[9px] text-slate-500">Drag &amp; drop a .txt file or click to browse</span>
+              </div>
+            </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <div>
+                <p className={labelClass}>Voice</p>
+                <div className="rounded-lg border border-slate-200 bg-white/80 px-2 py-1.5 text-[10px] text-slate-700">
+                  Aria · Female
+                </div>
+              </div>
+              <div>
+                <p className={labelClass}>Language</p>
+                <div className="rounded-lg border border-slate-200 bg-white/80 px-2 py-1.5 text-[10px] text-slate-700">
+                  English (US)
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-2">
+              <p className={labelClass}>Speaking Style</p>
+              <div className="rounded-lg border border-slate-200 bg-white/80 px-2 py-1.5 text-[10px] text-slate-700">
+                Default
+              </div>
+            </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <div>
+                <div className="mb-1 flex items-center justify-between">
+                  <p className={`${labelClass} mb-0`}>Speed</p>
+                  <span className="rounded bg-[#eaf1ff] px-1.5 py-0.5 font-mono text-[9px] font-medium text-[#3068d6]">
+                    1.00x
+                  </span>
+                </div>
+                <div className="h-2 rounded-full border border-slate-200/70 bg-[linear-gradient(to_right,#5b8def_0%,#84b3ff_33%,#d7e0f0_33%,#d7e0f0_100%)]" />
+              </div>
+              <div>
+                <div className="mb-1 flex items-center justify-between">
+                  <p className={`${labelClass} mb-0`}>Pitch</p>
+                  <span className="rounded bg-[#eaf1ff] px-1.5 py-0.5 font-mono text-[9px] font-medium text-[#3068d6]">
+                    +0%
+                  </span>
+                </div>
+                <div className="h-2 rounded-full border border-slate-200/70 bg-[linear-gradient(to_right,#5b8def_0%,#84b3ff_50%,#d7e0f0_50%,#d7e0f0_100%)]" />
+              </div>
+            </div>
+
+            <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-300/70 bg-amber-50 p-2.5">
+              <KeyRound size={12} className="mt-0.5 shrink-0 text-amber-500" />
+              <p className="text-[9px] leading-snug text-amber-700">
+                <span className="font-semibold text-amber-800">Connect Azure Speech to generate audio</span>
+                {' — '}
+                Add your Speech key and region in Settings.
+              </p>
+            </div>
+
+            <div className="mt-3 flex items-center justify-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 py-2 text-[10px] font-semibold text-amber-700">
+              <KeyRound size={12} />
+              Add Azure keys to generate
+            </div>
+          </div>
+
+          {/* Details column — matches DetailsPanel.jsx */}
+          <aside className="hidden w-[132px] shrink-0 flex-col gap-2 lg:flex">
+            <section className="glass rounded-xl p-2.5">
+              <p className="font-display text-[9px] font-semibold uppercase tracking-wider text-slate-600">
+                Details
+              </p>
+              <div className="mt-1.5 space-y-1.5 border-t border-slate-200/70 pt-1.5">
+                {[
+                  ['Status', 'Idle'],
+                  ['Character Count', '0'],
+                  ['Duration', '00:00'],
+                  ['Language', 'English (US)'],
+                  ['Voice Model', 'Aria (Neural)'],
+                  ['Output Format', 'MP3'],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex items-center justify-between gap-1 text-[9px]">
+                    <span className="text-slate-500">{k}</span>
+                    <span className="truncate font-medium text-slate-700">{v}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="glass rounded-xl p-2.5">
+              <p className="font-display text-[9px] font-semibold uppercase tracking-wider text-slate-600">
+                Export Options
+              </p>
+              <div className="mt-1.5 grid grid-cols-3 gap-1">
+                {[
+                  { label: 'MP3', icon: FileAudio, active: true },
+                  { label: 'WAV', icon: FileAudio },
+                  { label: 'SSML', icon: Code2 },
+                ].map(({ label, icon: Icon, active }) => (
+                  <div
+                    key={label}
+                    className={`flex flex-col items-center gap-0.5 rounded-md border px-1 py-1.5 text-[8px] font-medium ${
+                      active
+                        ? 'border-[#5b8def]/50 bg-[#eaf1ff] text-[#3068d6]'
+                        : 'border-slate-200 bg-white/60 text-slate-500'
+                    }`}
+                  >
+                    <Icon size={10} />
+                    {label}
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="glass rounded-xl p-2.5">
+              <p className="font-display text-[9px] font-semibold uppercase tracking-wider text-slate-600">
+                Recent Audio
+              </p>
+              <p className="mt-1.5 text-[9px] text-slate-400">Your generated clips will appear here.</p>
+            </section>
+          </aside>
+        </div>
       </div>
     </div>
   );
@@ -272,20 +358,10 @@ export default function Landing() {
           </motion.div>
         </motion.div>
 
-        {/* App preview — the "screenshot under the description" */}
-        <motion.div
-          initial={{ opacity: 0, y: 48 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto mt-16 max-w-5xl"
-        >
-          <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 9, ease: 'easeInOut', repeat: Infinity }}
-          >
-            <StudioPreview />
-          </motion.div>
-        </motion.div>
+        {/* App preview — static snapshot of the studio */}
+        <div className="mx-auto mt-16 max-w-5xl">
+          <StudioPreview />
+        </div>
       </main>
     </motion.div>
   );

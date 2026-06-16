@@ -1,5 +1,7 @@
 # MoonWave — Text to Speech with Azure AI
 
+<img width="1178" height="985" alt="image" src="https://github.com/user-attachments/assets/545717d9-babd-4340-a85e-9010fed013ad" />
+
 A polished, single-page web app that turns text into natural, expressive speech using
 **Microsoft Azure AI Speech**. It has two screens:
 

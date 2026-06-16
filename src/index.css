@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-ink-950 text-slate-200 font-sans antialiased;
+    margin: 0;
+    overflow-x: hidden;
+  }
+
+  /* Soft scrollbars that read on both the dark landing and light studio */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(91, 141, 239, 0.4) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgba(91, 141, 239, 0.35);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(91, 141, 239, 0.6);
+    background-clip: padding-box;
+  }
+}
+
+@layer components {
+  /* Light, frosted surface used across the studio panels */
+  .glass {
+    @apply border border-white/70 bg-white/70 backdrop-blur-xl;
+    box-shadow: 0 10px 30px -12px rgba(20, 40, 90, 0.18);
+  }
+
+  .glass-strong {
+    @apply border border-white/80 bg-white/85 backdrop-blur-2xl;
+    box-shadow: 0 24px 60px -24px rgba(20, 40, 90, 0.28);
+  }
+
+  /* Gradient text helper for the Azure-blue accent words */
+  .text-gradient {
+    @apply bg-moon-gradient bg-clip-text text-transparent;
+  }
+
+  /* Subtle focus ring consistent with the brand accent */
+  .focus-ring {
+    @apply outline-none ring-brand-500/50 focus-visible:ring-2;
+  }
+}
+
+/* Light dropdown lists for the studio's native selects */
+select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+/* ------------------------------------------------------------------ */
+/* Range sliders — clearly visible track + filled progress + thumb.    */
+/* Drive the filled portion by setting `--_pct` (e.g. style="--_pct:40%") */
+/* ------------------------------------------------------------------ */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* WebKit / Chromium track */
+input[type='range']::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    #5b8def 0%,
+    #84b3ff var(--_pct, 50%),
+    #d7e0f0 var(--_pct, 50%),
+    #d7e0f0 100%
+  );
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+/* Firefox track + native progress fill */
+input[type='range']::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: #d7e0f0;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+input[type='range']::-moz-range-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #5b8def, #84b3ff);
+}
+
+/* Thumb */
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  margin-top: -6px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 3px solid #5b8def;
+  box-shadow: 0 2px 7px rgba(46, 90, 180, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type='range']::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 3px solid #5b8def;
+  box-shadow: 0 2px 7px rgba(46, 90, 180, 0.4);
+}
+
+input[type='range']:hover::-webkit-slider-thumb {
+  transform: scale(1.08);
+}
+
+input[type='range']:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px rgba(91, 141, 239, 0.3);
+}

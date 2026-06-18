@@ -4,33 +4,13 @@
 
 MoonWave Studio turns text into natural-sounding voice clips with Azure AI Speech.
 
-The app has two parts:
-
-1. The frontend: the browser app you use.
-2. The backend: an Azure Function that securely talks to Azure Speech.
-
 Your Azure Speech key is never typed into the browser. It stays in your private backend settings.
 
-## What MoonWave Does
+## Start Here
 
-- Converts text into speech with Azure AI Speech.
-- Lets you choose voices, styles, speed, pitch, emotions, and output format.
-- Saves generated audio into normal project folders on your computer.
-- Stores Azure credentials only in backend settings, never in browser storage.
+Follow these steps in order.
 
-Project folders are saved like this:
-
-```text
-Your chosen folder/
-  Project Name/
-    project.json
-    clips/
-      voice-clip.mp3
-      voice-clip.ssml
-      voice-clip.json
-```
-
-## What You Need
+## 1. Install What You Need
 
 Install these first:
 
@@ -39,24 +19,13 @@ Install these first:
 - An Azure account
 - An Azure AI Speech resource
 
-You also need one backend option:
+If you want to run the backend on your computer, also install:
 
-- Local backend: install [Azure Functions Core Tools v4](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local)
-- Deployed backend: deploy the Azure Function to Azure and point the frontend to it
+- [Azure Functions Core Tools v4](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 
-If you want the easiest local setup, install Azure Functions Core Tools v4.
+If you do not install Azure Functions Core Tools, you can still use MoonWave, but you must deploy the backend to Azure first.
 
-## 1. Download The Project
-
-Clone the repo from GitHub, then open a terminal in the project folder.
-
-## 2. Install Packages
-
-```sh
-npm install
-```
-
-## 3. Create Your Azure Speech Resource
+## 2. Create Your Azure Speech Resource
 
 1. Go to the [Azure portal](https://portal.azure.com/).
 2. Create an Azure AI Speech resource.
@@ -65,13 +34,35 @@ npm install
 5. Copy one key.
 6. Copy the region, such as `eastus`.
 
-The key becomes `AZURE_SPEECH_KEY`.
+You will use these values later:
 
-The region becomes `AZURE_SPEECH_REGION`.
+```text
+AZURE_SPEECH_KEY
+AZURE_SPEECH_REGION
+```
 
-Never upload your real key to GitHub.
+Never upload your real Azure key to GitHub.
 
-## 4. Create Your Private Settings File
+## 3. Download MoonWave
+
+Clone the repo:
+
+```sh
+git clone https://github.com/LFxG1/MoonWave-TTS.git
+cd MoonWave-TTS
+```
+
+Or download the ZIP from GitHub and open the project folder on your computer.
+
+## 4. Install Project Packages
+
+Run this in the project folder:
+
+```sh
+npm install
+```
+
+## 5. Create Your Private Settings File
 
 Find this file:
 
@@ -100,9 +91,9 @@ Open `local.settings.json` and fill in your Azure Speech key and region:
 }
 ```
 
-`local.settings.json` is ignored by Git. Keep it private.
+Keep `local.settings.json` private. Git ignores this file on purpose.
 
-## 5. Start The Backend
+## 6. Start The Backend
 
 Run this in one terminal:
 
@@ -118,7 +109,7 @@ The backend runs at:
 http://localhost:7071/api
 ```
 
-If you see `func is not recognized`, Azure Functions Core Tools is not installed or your terminal cannot find it. Install Azure Functions Core Tools v4, close your terminal, reopen it, and try again.
+If you see `func is not recognized`, Azure Functions Core Tools is missing. Install Azure Functions Core Tools v4, close your terminal, reopen it, and try again.
 
 You can check the install with:
 
@@ -126,7 +117,7 @@ You can check the install with:
 func --version
 ```
 
-## 6. Start The Frontend
+## 7. Start The App
 
 Open a second terminal in the project folder.
 
@@ -142,19 +133,19 @@ Open:
 http://localhost:5173
 ```
 
-During local development, the frontend automatically sends `/api` requests to the local backend at `http://127.0.0.1:7071`.
+During local development, MoonWave automatically sends `/api` requests to the local backend at `http://127.0.0.1:7071`.
 
-## 7. Test MoonWave
+## 8. Test It
 
 1. Open MoonWave in your browser.
 2. Go to **Settings**.
-3. Check that the backend says ready.
+3. Confirm the backend says ready.
 4. Go to **Text to Speech**.
 5. Type text and generate a voice clip.
 
 ## If You Do Not Install Azure Functions Core Tools
 
-The browser app can still run, but the local backend cannot.
+The frontend can still run, but the local backend cannot.
 
 Use this path instead:
 
@@ -167,21 +158,38 @@ AZURE_SPEECH_REGION
 ALLOWED_ORIGIN
 ```
 
-3. Point the frontend to your deployed backend.
-
-Create a file named `.env.local` in the project folder:
+3. Create a file named `.env.local` in the project folder:
 
 ```env
 VITE_TTS_API_BASE_URL=https://your-function-app.azurewebsites.net/api
 ```
 
-Then run:
+4. Start the frontend:
 
 ```sh
 npm run dev
 ```
 
 In this setup, your computer runs the browser app and Azure runs the backend.
+
+## What MoonWave Does
+
+- Converts text into speech with Azure AI Speech.
+- Lets you choose voices, styles, speed, pitch, emotions, and output format.
+- Saves generated audio into normal project folders on your computer.
+- Keeps Azure credentials out of browser storage.
+
+Project folders are saved like this:
+
+```text
+Your chosen folder/
+  Project Name/
+    project.json
+    clips/
+      voice-clip.mp3
+      voice-clip.ssml
+      voice-clip.json
+```
 
 ## Deploy Your Own Copy
 

@@ -1,9 +1,10 @@
-import { FileAudio, Code2, Music4, Clock } from 'lucide-react';
+import { useState } from 'react';
+import { FileAudio, Code2, Music4, Clock, MoreHorizontal, Trash2 } from 'lucide-react';
 import { formatTimestamp } from '../lib/format.js';
 
 const STATUS_STYLES = {
   idle: { dot: 'bg-slate-400', text: 'text-slate-500', label: 'Idle' },
-  generating: { dot: 'bg-amber-500 animate-pulse', text: 'text-amber-600', label: 'Generating…' },
+  generating: { dot: 'bg-amber-500 animate-pulse', text: 'text-amber-600', label: 'Generating...' },
   ready: { dot: 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)]', text: 'text-emerald-600', label: 'Ready' },
   error: { dot: 'bg-red-500', text: 'text-red-600', label: 'Error' },
 };
@@ -21,21 +22,22 @@ export default function DetailsPanel({
   status = 'idle',
   charCount = 0,
   durationLabel = '00:00',
-  languageName = '—',
-  voiceName = '—',
+  languageName = 'None',
+  voiceName = 'None',
   format = 'mp3',
   onSetFormat,
   onExportSSML,
   hasAudio = false,
   recent = [],
   onSelectRecent,
+  onDeleteRecent,
   onViewAllRecent,
 }) {
   const statusStyle = STATUS_STYLES[status] || STATUS_STYLES.idle;
+  const [openMenuId, setOpenMenuId] = useState('');
 
   return (
     <div className="flex w-full flex-col gap-5">
-      {/* Details */}
       <section className="glass rounded-2xl p-5">
         <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-slate-600">
           Details
@@ -56,7 +58,6 @@ export default function DetailsPanel({
         </div>
       </section>
 
-      {/* Export options */}
       <section className="glass rounded-2xl p-5">
         <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-slate-600">
           Export Options
@@ -92,11 +93,10 @@ export default function DetailsPanel({
         </p>
       </section>
 
-      {/* Recent audio */}
       <section className="glass rounded-2xl p-5">
         <div className="flex items-center justify-between">
           <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-slate-600">
-            Recent Audio
+            Project Clips
           </h3>
           {recent.length > 0 && (
             <button
@@ -111,32 +111,56 @@ export default function DetailsPanel({
 
         {recent.length === 0 ? (
           <p className="mt-3 text-sm text-slate-400">
-            Your generated clips will appear here.
+            Saved clips from the active project will appear here.
           </p>
         ) : (
           <ul className="mt-3 flex flex-col gap-1">
             {recent.slice(0, 5).map((item) => (
               <li key={item.id}>
-                <button
-                  type="button"
-                  onClick={() => onSelectRecent?.(item)}
-                  disabled={!item.playable}
-                  className="group flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-slate-100/70 focus-ring disabled:cursor-not-allowed"
-                  title={item.playable ? 'Play' : 'Audio expired — regenerate to play'}
-                >
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#eef3ff] text-[#5b8def] group-hover:bg-[#e0e9ff]">
-                    <Music4 size={16} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium text-slate-700">
-                      {item.title}
+                <div className="group flex items-center gap-1 rounded-xl px-2 py-2 transition-colors hover:bg-slate-100/70">
+                  <button
+                    type="button"
+                    onClick={() => onSelectRecent?.(item)}
+                    disabled={!item.playable}
+                    className="flex min-w-0 flex-1 items-center gap-3 text-left focus-ring disabled:cursor-not-allowed"
+                    title={item.playable ? 'Load in studio' : 'Clip unavailable'}
+                  >
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#eef3ff] text-[#5b8def] group-hover:bg-[#e0e9ff]">
+                      <Music4 size={16} />
                     </span>
-                    <span className="flex items-center gap-1 text-[11px] text-slate-400">
-                      <Clock size={11} />
-                      {formatTimestamp(item.createdAt)}
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-slate-700">
+                        {item.title}
+                      </span>
+                      <span className="flex items-center gap-1 text-[11px] text-slate-400">
+                        <Clock size={11} />
+                        {formatTimestamp(item.createdAt)}
+                      </span>
                     </span>
-                  </span>
-                </button>
+                  </button>
+                  {openMenuId === item.id ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenMenuId('');
+                        onDeleteRecent?.(item);
+                      }}
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100 focus-ring"
+                      title="Delete clip"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setOpenMenuId(item.id)}
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-slate-400 opacity-0 transition-opacity hover:bg-slate-100 hover:text-slate-700 focus-ring group-hover:opacity-100"
+                      title="Clip actions"
+                    >
+                      <MoreHorizontal size={17} />
+                    </button>
+                  )}
+                </div>
               </li>
             ))}
           </ul>

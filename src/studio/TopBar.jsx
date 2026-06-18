@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, CircleDot } from 'lucide-react';
+import { ChevronLeft, FolderOpen, Plus } from 'lucide-react';
 import Logo from '../components/Logo.jsx';
 
 const TAB_LABELS = {
@@ -10,30 +10,62 @@ const TAB_LABELS = {
   settings: 'Settings',
 };
 
-export default function TopBar({ activeTab, onChange, isConfigured }) {
+export default function TopBar({
+  activeTab,
+  onChange,
+  isConfigured,
+  projects = [],
+  currentProjectId = '',
+  onProjectChange,
+}) {
   const navigate = useNavigate();
+  const hasProjects = projects.length > 0;
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-slate-200/70 bg-white/70 px-4 py-3 backdrop-blur-xl sm:px-6">
-      <div className="flex items-center gap-4">
+    <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-slate-200/70 bg-white/70 px-4 py-3 shadow-[0_20px_60px_-38px_rgba(0,0,0,0.9)] backdrop-blur-xl sm:px-6">
+      <div className="flex min-w-0 items-center gap-4">
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="rounded-lg focus-ring"
+          className="shrink-0 rounded-lg focus-ring"
           aria-label="Back to MoonWave home"
         >
-          <Logo size="sm" subtitle="Studio" tone="dark" />
+          <Logo size="sm" subtitle="Studio" tone="light" />
         </button>
 
-        <span className="hidden h-6 w-px bg-slate-200 md:block" />
+        <span className="hidden h-6 w-px shrink-0 bg-slate-200 md:block" />
 
-        <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-xs text-slate-500 md:flex">
-          <CircleDot size={13} className="text-[#5b8def]" />
-          Project · Untitled
+        <div className="hidden min-w-0 items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-xs text-slate-500 md:flex">
+          {hasProjects ? (
+            <>
+              <FolderOpen size={13} className="shrink-0 text-[#5b8def]" />
+              <span className="shrink-0 text-slate-400">Project</span>
+              <select
+                value={currentProjectId}
+                onChange={(event) => onProjectChange?.(event.target.value)}
+                className="max-w-48 truncate bg-transparent text-xs font-medium text-slate-700 outline-none"
+                aria-label="Current project"
+              >
+                {projects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onChange('projects')}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-[#3068d6] focus-ring"
+            >
+              <Plus size={13} />
+              Create project
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Mobile tab switcher (sidebar is hidden below lg) */}
       <select
         value={activeTab}
         onChange={(e) => onChange(e.target.value)}
@@ -47,19 +79,13 @@ export default function TopBar({ activeTab, onChange, isConfigured }) {
         ))}
       </select>
 
-      <div className="flex items-center gap-3">
-        <span
-          className={`hidden items-center gap-2 rounded-full px-3 py-1 text-xs font-medium sm:flex ${
-            isConfigured ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
-          }`}
-        >
-          <span
-            className={`h-1.5 w-1.5 rounded-full ${
-              isConfigured ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 'bg-amber-500'
-            }`}
-          />
-          {isConfigured ? 'Live' : 'Offline'}
-        </span>
+      <div className="flex shrink-0 items-center gap-3">
+        {isConfigured && (
+          <span className="hidden items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-600 sm:flex">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+            Backend ready
+          </span>
+        )}
 
         <button
           type="button"

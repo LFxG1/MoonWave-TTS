@@ -1,20 +1,21 @@
-// Thin wrapper around the Microsoft Cognitive Services Speech SDK.
-// The SDK is imported dynamically so it is only loaded when the user
-// actually generates speech (keeps the initial landing bundle small).
-
 export const OUTPUT_FORMATS = {
   mp3: {
     label: 'MP3',
     mime: 'audio/mpeg',
     ext: 'mp3',
-    sdkFormatName: 'Audio24Khz96KBitRateMonoMp3',
   },
   wav: {
     label: 'WAV',
     mime: 'audio/wav',
     ext: 'wav',
-    sdkFormatName: 'Riff24Khz16BitMonoPcm',
   },
+};
+
+export const DEFAULT_HD_PARAMETERS = {
+  temperature: 0.7,
+  topP: 0.7,
+  topK: 22,
+  cfgScale: 1.4,
 };
 
 /** Escape characters that would otherwise break the SSML document. */
@@ -32,6 +33,59 @@ function toSignedPercent(value) {
   return `${rounded >= 0 ? '+' : ''}${rounded}%`;
 }
 
+function escapeTextWithPauseMarkers(text, pauseMarkers = true) {
+  if (!pauseMarkers) {
+    return escapeXml(text);
+  }
+
+  const pattern = /\[pause:(250ms|500ms|1s)\]/g;
+  let output = '';
+  let lastIndex = 0;
+  String(text).replace(pattern, (match, duration, index) => {
+    output += escapeXml(String(text).slice(lastIndex, index));
+    output += `<break time="${duration}"/>`;
+    lastIndex = index + match.length;
+    return match;
+  });
+  output += escapeXml(String(text).slice(lastIndex));
+  return output;
+}
+
+export function getTtsApiBaseUrl() {
+  return (import.meta.env.VITE_TTS_API_BASE_URL || '/api').replace(/\/+$/, '') || '/api';
+}
+
+function endpoint(path) {
+  const baseUrl = getTtsApiBaseUrl();
+  const safePath = path.startsWith('/') ? path : `/${path}`;
+
+  if (baseUrl.startsWith('http://') || baseUrl.startsWith('https://')) {
+    return `${baseUrl}${safePath}`;
+  }
+
+  if (baseUrl.startsWith('/')) {
+    return `${baseUrl}${safePath}`;
+  }
+
+  throw new Error('VITE_TTS_API_BASE_URL must be a relative path or an http(s) URL.');
+}
+
+export function redactSensitiveText(value) {
+  return String(value).replace(
+    /(Ocp-Apim-Subscription-Key=|AZURE_SPEECH_KEY=)[^&\s)]+/gi,
+    '$1[redacted]'
+  );
+}
+
+async function readErrorMessage(response) {
+  try {
+    const data = await response.json();
+    return data?.error?.message || data?.message || response.statusText;
+  } catch {
+    return response.statusText || 'The request could not be completed.';
+  }
+}
+
 /** Build an SSML document with prosody (rate/pitch) and optional speaking style. */
 export function buildSSML({
   text,
@@ -39,107 +93,127 @@ export function buildSSML({
   locale,
   style,
   styleDegree,
+  stylePrompt,
+  pauseMarkers = true,
+  hdParameters,
   ratePercent = 0,
   pitchPercent = 0,
 }) {
-  const safeText = escapeXml(text);
+  const safeLocale = escapeXml(locale);
+  const safeVoice = escapeXml(voice);
+  const voiceParameters = formatHdParameters(hdParameters);
+  const voiceAttributes = voiceParameters
+    ? ` name="${safeVoice}" parameters="${escapeXml(voiceParameters)}"`
+    : ` name="${safeVoice}"`;
   const prosody = `<prosody rate="${toSignedPercent(ratePercent)}" pitch="${toSignedPercent(
     pitchPercent
-  )}">${safeText}</prosody>`;
+  )}">${escapeTextWithPauseMarkers(text, pauseMarkers)}</prosody>`;
 
   let inner = prosody;
-  if (style && style !== 'default') {
-    const degreeAttr = styleDegree ? ` styledegree="${styleDegree}"` : '';
-    inner = `<mstts:express-as style="${style}"${degreeAttr}>${prosody}</mstts:express-as>`;
+  const cleanPrompt = String(stylePrompt || '').trim();
+  if (cleanPrompt) {
+    inner = `<mstts:express-as style="${escapeXml(cleanPrompt)}">${prosody}</mstts:express-as>`;
+  } else if (style && style !== 'default') {
+    const numericDegree = Number(styleDegree);
+    const degreeAttr =
+      styleDegree && Number.isFinite(numericDegree) ? ` styledegree="${numericDegree}"` : '';
+    inner = `<mstts:express-as style="${escapeXml(style)}"${degreeAttr}>${prosody}</mstts:express-as>`;
   }
 
   return (
     `<speak version="1.0" ` +
     `xmlns="http://www.w3.org/2001/10/synthesis" ` +
     `xmlns:mstts="https://www.w3.org/2001/mstts" ` +
-    `xml:lang="${locale}">` +
-    `<voice name="${voice}">${inner}</voice>` +
+    `xml:lang="${safeLocale}">` +
+    `<voice${voiceAttributes}>${inner}</voice>` +
     `</speak>`
   );
 }
 
+export function formatHdParameters(parameters) {
+  if (!parameters || typeof parameters !== 'object') return '';
+  const merged = { ...DEFAULT_HD_PARAMETERS, ...parameters };
+  const temperature = Number(merged.temperature);
+  const topP = Number(merged.topP);
+  const topK = Number(merged.topK);
+  const cfgScale = Number(merged.cfgScale);
+  if (
+    !Number.isFinite(temperature) ||
+    !Number.isFinite(topP) ||
+    !Number.isFinite(topK) ||
+    !Number.isFinite(cfgScale)
+  ) {
+    return '';
+  }
+  return [
+    `top_p=${topP}`,
+    `top_k=${Math.round(topK)}`,
+    `temperature=${temperature}`,
+    `cfg_scale=${cfgScale}`,
+  ].join(';');
+}
+
 /**
- * Synthesize speech with Azure and return the audio as a Blob + object URL.
+ * Synthesize speech through the backend Azure Function and return audio as a Blob + object URL.
  * Throws an Error with a human-readable message on any failure.
  */
 export async function synthesizeSpeech({
-  key,
-  region,
   text,
   voice,
   locale,
   style,
   styleDegree,
+  stylePrompt,
+  pauseMarkers = true,
+  hdParameters,
   ratePercent = 0,
   pitchPercent = 0,
   format = 'mp3',
 }) {
-  if (!key || !region) {
-    throw new Error('Azure Speech key and region are required. Add them in Settings.');
-  }
   if (!text || !text.trim()) {
     throw new Error('Please enter some text to convert to speech.');
   }
 
-  const SpeechSDK = await import('microsoft-cognitiveservices-speech-sdk');
   const outputFormat = OUTPUT_FORMATS[format] || OUTPUT_FORMATS.mp3;
+  const requestBody = {
+    text,
+    voice,
+    locale,
+    style,
+    styleDegree,
+    stylePrompt,
+    pauseMarkers,
+    hdParameters,
+    ratePercent,
+    pitchPercent,
+    format,
+  };
 
-  const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(key.trim(), region.trim());
-  speechConfig.speechSynthesisVoiceName = voice;
-  speechConfig.speechSynthesisOutputFormat =
-    SpeechSDK.SpeechSynthesisOutputFormat[outputFormat.sdkFormatName];
+  const response = await fetch(endpoint('/tts'), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestBody),
+  });
 
-  const ssml = buildSSML({ text, voice, locale, style, styleDegree, ratePercent, pitchPercent });
-
-  // Passing `null` as the audio config synthesizes to memory instead of the
-  // default speaker, so we control playback ourselves.
-  const synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig, null);
-
-  try {
-    const result = await new Promise((resolve, reject) => {
-      synthesizer.speakSsmlAsync(ssml, resolve, reject);
-    });
-
-    if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
-      const blob = new Blob([result.audioData], { type: outputFormat.mime });
-      const url = URL.createObjectURL(blob);
-      // audioDuration is in 100-nanosecond ticks when present.
-      const durationSec = result.audioDuration ? result.audioDuration / 1e7 : null;
-      return {
-        blob,
-        url,
-        mime: outputFormat.mime,
-        ext: outputFormat.ext,
-        format,
-        durationSec,
-        ssml,
-      };
-    }
-
-    if (result.reason === SpeechSDK.ResultReason.Canceled) {
-      const details = SpeechSDK.CancellationDetails.fromResult(result);
-      let message = `Synthesis canceled (${details.reason}).`;
-      if (details.errorDetails) {
-        message += ` ${details.errorDetails}`;
-      }
-      if (
-        details.reason === SpeechSDK.CancellationReason.Error &&
-        /401|403|authentication|forbidden/i.test(details.errorDetails || '')
-      ) {
-        message += ' Check that your Speech key and region are correct in Settings.';
-      }
-      throw new Error(message);
-    }
-
-    throw new Error('Speech synthesis failed for an unknown reason.');
-  } finally {
-    synthesizer.close();
+  if (!response.ok) {
+    throw new Error(redactSensitiveText(await readErrorMessage(response)));
   }
+
+  const blob = await response.blob();
+  const contentType = response.headers.get('content-type') || outputFormat.mime;
+  const url = URL.createObjectURL(blob);
+
+  return {
+    blob,
+    url,
+    mime: contentType,
+    ext: outputFormat.ext,
+    format,
+    durationSec: null,
+    ssml: previewSSML(requestBody),
+  };
 }
 
 /** Generate an SSML preview without calling Azure (used by the SSML export). */
@@ -147,21 +221,35 @@ export function previewSSML(params) {
   return buildSSML(params);
 }
 
-/** Retrieve the full list of voices available to the account (used to test the key). */
-export async function fetchAzureVoices({ key, region }) {
-  if (!key || !region) {
-    throw new Error('Azure Speech key and region are required.');
+/** Retrieve the backend voice list to test the deployed Azure Function. */
+export async function fetchAzureVoices() {
+  const response = await fetch(endpoint('/voices'), {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(redactSensitiveText(await readErrorMessage(response)));
   }
-  const SpeechSDK = await import('microsoft-cognitiveservices-speech-sdk');
-  const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(key.trim(), region.trim());
-  const synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig, null);
-  try {
-    const result = await synthesizer.getVoicesAsync();
-    if (result.reason === SpeechSDK.ResultReason.VoicesListRetrieved) {
-      return result.voices || [];
-    }
-    throw new Error(result.errorDetails || 'Could not retrieve the voice list. Check your key and region.');
-  } finally {
-    synthesizer.close();
+
+  const data = await response.json();
+  return Array.isArray(data?.voices) ? data.voices : [];
+}
+
+/** Check whether the Function host is reachable and has Speech app settings. */
+export async function fetchBackendHealth() {
+  const response = await fetch(endpoint('/health'), {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(redactSensitiveText(await readErrorMessage(response)));
   }
+
+  return response.json();
 }

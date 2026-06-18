@@ -1,5 +1,7 @@
 # MoonWave Studio
 
+![MoonWave Studio preview](public/moonwave-studio-preview.png)
+
 MoonWave Studio turns text into natural-sounding voice clips with Azure AI Speech.
 
 The app has two parts:

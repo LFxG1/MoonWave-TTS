@@ -1,6 +1,9 @@
 # MoonWave Studio
 
-![MoonWave Studio preview](public/moonwave-studio-preview.png)
+![MoonWave Studio preview]
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/94846d8a-8991-4271-89be-01c8cbb0cafd" />
+
 
 MoonWave Studio turns text into natural-sounding voice clips with Azure AI Speech.
 

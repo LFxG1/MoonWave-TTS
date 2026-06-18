@@ -40,7 +40,7 @@
 }
 
 @layer components {
-  /* Light, frosted surface used across the studio panels */
+  /* Frosted surface used across the studio panels */
   .glass {
     @apply border border-white/70 bg-white/70 backdrop-blur-xl;
     box-shadow: 0 10px 30px -12px rgba(20, 40, 90, 0.18);
@@ -138,4 +138,195 @@ input[type='range']:hover::-webkit-slider-thumb {
 
 input[type='range']:focus-visible::-webkit-slider-thumb {
   box-shadow: 0 0 0 4px rgba(91, 141, 239, 0.3);
+}
+
+/* ------------------------------------------------------------------ */
+/* MoonWave Studio dark surface                                        */
+/* ------------------------------------------------------------------ */
+.studio-dark {
+  color: #dbeafe;
+  background:
+    radial-gradient(circle at 14% 10%, rgba(186, 220, 255, 0.18), transparent 28%),
+    radial-gradient(circle at 82% 18%, rgba(34, 211, 238, 0.14), transparent 30%),
+    linear-gradient(145deg, #030712 0%, #07111f 44%, #061726 100%) !important;
+  color-scheme: dark;
+}
+
+.studio-dark .glass,
+.studio-dark .glass-strong {
+  border-color: rgba(148, 163, 184, 0.18);
+  background:
+    linear-gradient(145deg, rgba(10, 18, 36, 0.74), rgba(8, 20, 34, 0.56)),
+    rgba(8, 13, 31, 0.58);
+  box-shadow: 0 24px 70px -34px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.studio-dark .text-slate-950,
+.studio-dark .text-slate-900,
+.studio-dark .text-slate-800 {
+  color: #f8fbff !important;
+}
+
+.studio-dark .text-slate-700 {
+  color: #d9e8ff !important;
+}
+
+.studio-dark .text-slate-600 {
+  color: #bfd3f5 !important;
+}
+
+.studio-dark .text-slate-500 {
+  color: #94a9cc !important;
+}
+
+.studio-dark .text-slate-400 {
+  color: #7890b3 !important;
+}
+
+.studio-dark .text-slate-300 {
+  color: #b9cbeb !important;
+}
+
+.studio-dark .border-slate-200,
+.studio-dark .border-slate-200\/70,
+.studio-dark .border-white\/70,
+.studio-dark .border-white\/80,
+.studio-dark .border-slate-300 {
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+.studio-dark .divide-slate-200\/70 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(148, 163, 184, 0.14) !important;
+}
+
+.studio-dark .bg-white,
+.studio-dark .bg-white\/90,
+.studio-dark .bg-white\/85,
+.studio-dark .bg-white\/80,
+.studio-dark .bg-white\/75,
+.studio-dark .bg-white\/70,
+.studio-dark .bg-white\/65,
+.studio-dark .bg-white\/60,
+.studio-dark .bg-white\/55,
+.studio-dark .bg-white\/50,
+.studio-dark .bg-white\/40 {
+  background-color: rgba(9, 17, 33, 0.64) !important;
+}
+
+.studio-dark .hover\:bg-white\/80:hover,
+.studio-dark .hover\:bg-white\/60:hover,
+.studio-dark .hover\:bg-white:hover {
+  background-color: rgba(15, 30, 52, 0.82) !important;
+}
+
+.studio-dark .bg-slate-50,
+.studio-dark .bg-slate-100,
+.studio-dark .hover\:bg-slate-100\/70:hover,
+.studio-dark .hover\:bg-slate-100:hover,
+.studio-dark .hover\:bg-slate-200:hover {
+  background-color: rgba(15, 30, 52, 0.76) !important;
+}
+
+.studio-dark .bg-\[\#eef3ff\],
+.studio-dark .bg-\[\#eaf1ff\],
+.studio-dark .hover\:bg-\[\#eaf1ff\]:hover,
+.studio-dark .group:hover .group-hover\:bg-\[\#e0e9ff\] {
+  background-color: rgba(34, 211, 238, 0.13) !important;
+}
+
+.studio-dark .bg-emerald-50 {
+  background-color: rgba(6, 78, 59, 0.25) !important;
+}
+
+.studio-dark .bg-amber-50 {
+  background-color: rgba(120, 53, 15, 0.25) !important;
+}
+
+.studio-dark .bg-red-50 {
+  background-color: rgba(127, 29, 29, 0.28) !important;
+}
+
+.studio-dark .border-emerald-300\/60,
+.studio-dark .border-emerald-300\/70 {
+  border-color: rgba(52, 211, 153, 0.34) !important;
+}
+
+.studio-dark .border-amber-300\/70 {
+  border-color: rgba(251, 191, 36, 0.34) !important;
+}
+
+.studio-dark .border-red-300\/60,
+.studio-dark .border-red-300\/70 {
+  border-color: rgba(248, 113, 113, 0.34) !important;
+}
+
+.studio-dark .text-\[\#3068d6\],
+.studio-dark .text-\[\#5b8def\],
+.studio-dark .hover\:text-\[\#3068d6\]:hover,
+.studio-dark .hover\:text-\[\#5b8def\]:hover {
+  color: #7dd3fc !important;
+}
+
+.studio-dark .bg-moon-gradient {
+  background-image: linear-gradient(120deg, #38bdf8 0%, #2e90fa 48%, #93c5fd 100%) !important;
+}
+
+.studio-dark .ring-white\/70 {
+  --tw-ring-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.studio-dark input,
+.studio-dark textarea,
+.studio-dark select {
+  color: #eaf3ff;
+  caret-color: #7dd3fc;
+}
+
+.studio-dark input::placeholder,
+.studio-dark textarea::placeholder {
+  color: rgba(148, 163, 184, 0.72);
+}
+
+.studio-dark select option,
+.studio-dark optgroup {
+  background-color: #07111f;
+  color: #eaf3ff;
+}
+
+.studio-dark .shadow-soft,
+.studio-dark .shadow-\[0_10px_24px_-8px_rgba\(91\,141\,239\,0\.75\)\],
+.studio-dark .shadow-\[0_14px_30px_-10px_rgba\(91\,141\,239\,0\.85\)\] {
+  box-shadow: 0 18px 42px -18px rgba(56, 189, 248, 0.72) !important;
+}
+
+.studio-dark input[type='range']::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    #38bdf8 0%,
+    #93c5fd var(--_pct, 50%),
+    rgba(30, 41, 59, 0.9) var(--_pct, 50%),
+    rgba(30, 41, 59, 0.9) 100%
+  );
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.studio-dark input[type='range']::-moz-range-track {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.studio-dark input[type='range']::-moz-range-progress {
+  background: linear-gradient(to right, #38bdf8, #93c5fd);
+}
+
+.studio-dark input[type='range']::-webkit-slider-thumb {
+  background: #eaf3ff;
+  border-color: #38bdf8;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.5);
+}
+
+.studio-dark input[type='range']::-moz-range-thumb {
+  background: #eaf3ff;
+  border-color: #38bdf8;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.5);
 }

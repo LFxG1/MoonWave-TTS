@@ -5,42 +5,37 @@ import {
   useEffect,
   useCallback,
   useMemo,
+  useRef,
 } from 'react';
-
-const STORAGE_KEY = 'moonwave.settings.v1';
-
-export const DEFAULT_SETTINGS = {
-  azureKey: '',
-  azureRegion: '',
-  defaultVoice: 'en-US-AriaNeural',
-  defaultLocale: 'en-US',
-  outputFormat: 'mp3', // 'mp3' | 'wav'
-};
-
-function readStoredSettings() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return DEFAULT_SETTINGS;
-    const parsed = JSON.parse(raw);
-    return { ...DEFAULT_SETTINGS, ...parsed };
-  } catch (error) {
-    console.warn('MoonWave: could not read settings from localStorage.', error);
-    return DEFAULT_SETTINGS;
-  }
-}
+import {
+  clearStoredSettings,
+  DEFAULT_SETTINGS,
+  persistStoredSettings,
+  readStoredSettings,
+} from './settingsStorage.js';
+import { fetchBackendHealth } from './azureTts.js';
 
 const SettingsContext = createContext(null);
 
 export function SettingsProvider({ children }) {
   const [settings, setSettings] = useState(readStoredSettings);
+  const mountedRef = useRef(true);
+  const [backendStatus, setBackendStatus] = useState({
+    state: 'checking',
+    voices: 0,
+    message: 'Checking backend connection.',
+  });
 
-  // Persist any change back to localStorage so keys stay on this machine only.
+  // Only non-secret studio preferences are stored in the browser.
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    } catch (error) {
-      console.warn('MoonWave: could not persist settings to localStorage.', error);
-    }
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    persistStoredSettings(settings);
   }, [settings]);
 
   const updateSettings = useCallback((patch) => {
@@ -48,17 +43,60 @@ export function SettingsProvider({ children }) {
   }, []);
 
   const resetSettings = useCallback(() => {
+    clearStoredSettings();
     setSettings(DEFAULT_SETTINGS);
   }, []);
+
+  const checkBackend = useCallback(async () => {
+    if (mountedRef.current) {
+      setBackendStatus((previous) => ({
+        ...previous,
+        state: 'checking',
+        message: 'Checking backend connection.',
+      }));
+    }
+
+    try {
+      const health = await fetchBackendHealth();
+      const ready = Boolean(health?.ok && health?.configured);
+      const nextStatus = {
+        state: ready ? 'ready' : 'offline',
+        voices: 0,
+        message: ready
+          ? 'Function backend connected.'
+          : 'Function connected, but Azure Speech app settings are missing.',
+      };
+      if (mountedRef.current) {
+        setBackendStatus(nextStatus);
+      }
+      return nextStatus;
+    } catch (error) {
+      const nextStatus = {
+        state: 'offline',
+        voices: 0,
+        message: error.message || String(error),
+      };
+      if (mountedRef.current) {
+        setBackendStatus(nextStatus);
+      }
+      return nextStatus;
+    }
+  }, []);
+
+  useEffect(() => {
+    checkBackend();
+  }, [checkBackend]);
 
   const value = useMemo(
     () => ({
       settings,
       updateSettings,
       resetSettings,
-      isConfigured: Boolean(settings.azureKey.trim() && settings.azureRegion.trim()),
+      backendStatus,
+      checkBackend,
+      isConfigured: backendStatus.state === 'ready',
     }),
-    [settings, updateSettings, resetSettings]
+    [settings, updateSettings, resetSettings, backendStatus, checkBackend]
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

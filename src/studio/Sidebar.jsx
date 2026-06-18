@@ -41,20 +41,12 @@ export default function Sidebar({ activeTab, onChange, isConfigured }) {
         })}
       </nav>
 
-      <div className="rounded-xl border border-slate-200 bg-white/70 p-3">
-        <p className="text-xs font-medium text-slate-700">Workspace</p>
-        <p className="mt-0.5 text-sm text-slate-500">Personal Studio</p>
-        <div className="mt-3 flex items-center gap-2 border-t border-slate-200 pt-3">
-          <span
-            className={`h-2 w-2 rounded-full ${
-              isConfigured ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)]' : 'bg-amber-500'
-            }`}
-          />
-          <span className="text-xs text-slate-500">
-            Azure Speech · {isConfigured ? 'Connected' : 'Not connected'}
-          </span>
+      {isConfigured && (
+        <div className="inline-flex w-fit items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2">
+          <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
+          <span className="text-xs font-medium text-emerald-700">Backend - Ready</span>
         </div>
-      </div>
+      )}
     </aside>
   );
 }

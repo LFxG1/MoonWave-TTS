@@ -1,70 +1,318 @@
-# MoonWave — Text to Speech with Azure AI
+# MoonWave Studio
 
-A polished, single-page web app that turns text into natural, expressive speech using
-**Microsoft Azure AI Speech**. It has two screens:
+MoonWave Studio turns text into natural-sounding voice clips with Azure AI Speech.
 
-1. **Landing** — a full-bleed cosmic hero with one pill button into the app.
-2. **Voice Studio** — type or upload text, pick a voice / language / speaking style,
-   tune speed & pitch, and generate audio you can preview and download.
+The app has two parts:
 
-Your Azure key never leaves your machine: it is entered in the in-app **Settings** tab and
-stored only in your browser's `localStorage`, then sent directly to Azure when you generate.
+1. The frontend: the browser app you use.
+2. The backend: an Azure Function that securely talks to Azure Speech.
 
-## Tech stack
+Your Azure Speech key is never typed into the browser. It stays in your private backend settings.
 
-- **React 19** + **Vite** (fast dev server & build)
-- **Tailwind CSS v3** (styling)
-- **Framer Motion** (entrance, hover, and page-transition motion)
-- **lucide-react** (icons)
-- **microsoft-cognitiveservices-speech-sdk** (Azure Speech synthesis, runs in the browser)
-- **react-router-dom** (Landing ↔ Studio routing)
+## What MoonWave Does
 
-## Getting started
+- Converts text into speech with Azure AI Speech.
+- Lets you choose voices, styles, speed, pitch, emotions, and output format.
+- Saves generated audio into normal project folders on your computer.
+- Stores Azure credentials only in backend settings, never in browser storage.
 
-```bash
-npm install      # install dependencies (already done if node_modules exists)
-npm run dev      # start the dev server at http://localhost:5173
+Project folders are saved like this:
+
+```text
+Your chosen folder/
+  Project Name/
+    project.json
+    clips/
+      voice-clip.mp3
+      voice-clip.ssml
+      voice-clip.json
 ```
 
-Then open the app, click **Open Voice Studio**, go to **Settings**, and add your
-Azure Speech **key** and **region**.
+## What You Need
 
-### Production build
+Install these first:
 
-```bash
-npm run build    # outputs static files to dist/
-npm run preview  # preview the production build locally
+- [Node.js](https://nodejs.org/) 20 or newer
+- [Git](https://git-scm.com/)
+- An Azure account
+- An Azure AI Speech resource
+
+You also need one backend option:
+
+- Local backend: install [Azure Functions Core Tools v4](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local)
+- Deployed backend: deploy the Azure Function to Azure and point the frontend to it
+
+If you want the easiest local setup, install Azure Functions Core Tools v4.
+
+## 1. Download The Project
+
+Clone the repo from GitHub, then open a terminal in the project folder.
+
+## 2. Install Packages
+
+```sh
+npm install
 ```
 
-## Getting an Azure Speech key
+## 3. Create Your Azure Speech Resource
 
-1. In the [Azure portal](https://portal.azure.com), create a **Speech service** resource
-   (the free **F0** tier works for testing).
-2. Open the resource → **Keys and Endpoint**.
-3. Copy **KEY 1** and the **Location/Region** (e.g. `eastus`).
-4. Paste both into the app's **Settings** tab and click **Test connection**.
+1. Go to the [Azure portal](https://portal.azure.com/).
+2. Create an Azure AI Speech resource.
+3. Open the resource.
+4. Go to **Keys and Endpoint**.
+5. Copy one key.
+6. Copy the region, such as `eastus`.
 
-## How it works
+The key becomes `AZURE_SPEECH_KEY`.
 
-- Speed and pitch are applied via SSML `<prosody>`; speaking styles via
-  `<mstts:express-as>` (only when the selected voice supports the style).
-- Generated audio is returned as an in-memory blob, so playback and download work without
-  a backend. Clips are kept for the current session (object URLs cannot be persisted),
-  while a lightweight history (titles, voice, timestamp) is saved across reloads.
+The region becomes `AZURE_SPEECH_REGION`.
 
-## Project structure
+Never upload your real key to GitHub.
 
-```
-src/
-  components/      Reusable UI (NightSky, Logo, PillButton, Waveform, AudioPlayer)
-  studio/          Studio shell (TopBar, Sidebar, DetailsPanel) and panels/
-  pages/           Landing.jsx, Studio.jsx
-  lib/             azureTts.js, voices.js, useSettings.jsx, useRecent.js, format.js
+## 4. Create Your Private Settings File
+
+Find this file:
+
+```text
+local.settings.example.json
 ```
 
-## Notes & next steps
+Make a copy of it and rename the copy to:
 
-- Document upload currently supports plain-text files (`.txt`, `.md`). `.docx` parsing
-  could be added with a library such as `mammoth`.
-- For a multi-user or production deployment, move the Azure key behind a small token
-  endpoint/proxy instead of storing it client-side.
+```text
+local.settings.json
+```
+
+Open `local.settings.json` and fill in your Azure Speech key and region:
+
+```json
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AZURE_SPEECH_KEY": "paste-your-key-here",
+    "AZURE_SPEECH_REGION": "eastus",
+    "ALLOWED_ORIGIN": "http://localhost:5173,http://127.0.0.1:5173"
+  }
+}
+```
+
+`local.settings.json` is ignored by Git. Keep it private.
+
+## 5. Start The Backend
+
+Run this in one terminal:
+
+```sh
+npm run api:start
+```
+
+Leave that terminal open.
+
+The backend runs at:
+
+```text
+http://localhost:7071/api
+```
+
+If you see `func is not recognized`, Azure Functions Core Tools is not installed or your terminal cannot find it. Install Azure Functions Core Tools v4, close your terminal, reopen it, and try again.
+
+You can check the install with:
+
+```sh
+func --version
+```
+
+## 6. Start The Frontend
+
+Open a second terminal in the project folder.
+
+Run:
+
+```sh
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:5173
+```
+
+During local development, the frontend automatically sends `/api` requests to the local backend at `http://127.0.0.1:7071`.
+
+## 7. Test MoonWave
+
+1. Open MoonWave in your browser.
+2. Go to **Settings**.
+3. Check that the backend says ready.
+4. Go to **Text to Speech**.
+5. Type text and generate a voice clip.
+
+## If You Do Not Install Azure Functions Core Tools
+
+The browser app can still run, but the local backend cannot.
+
+Use this path instead:
+
+1. Deploy the Azure Function backend to Azure.
+2. Add these settings to the Azure Function App:
+
+```text
+AZURE_SPEECH_KEY
+AZURE_SPEECH_REGION
+ALLOWED_ORIGIN
+```
+
+3. Point the frontend to your deployed backend.
+
+Create a file named `.env.local` in the project folder:
+
+```env
+VITE_TTS_API_BASE_URL=https://your-function-app.azurewebsites.net/api
+```
+
+Then run:
+
+```sh
+npm run dev
+```
+
+In this setup, your computer runs the browser app and Azure runs the backend.
+
+## Deploy Your Own Copy
+
+Each person should deploy their own backend and use their own Azure Speech resource.
+
+Do not share one public backend unless you add login, rate limits, abuse protection, and billing controls.
+
+### Deploy The Backend
+
+Create an Azure Function App in Azure, then deploy this repo's Function backend.
+
+You can deploy with:
+
+- The Azure Functions extension in Visual Studio Code
+- Azure Functions Core Tools from the terminal
+- Your normal Azure deployment workflow
+
+After deployment, add these Function App settings in Azure:
+
+```text
+AZURE_SPEECH_KEY
+AZURE_SPEECH_REGION
+ALLOWED_ORIGIN
+```
+
+Set `ALLOWED_ORIGIN` to the website where your frontend is hosted, for example:
+
+```text
+https://your-site-name.netlify.app
+```
+
+### Deploy The Frontend
+
+Set this environment variable in your frontend host:
+
+```text
+VITE_TTS_API_BASE_URL=https://your-function-app.azurewebsites.net/api
+```
+
+Then build:
+
+```sh
+npm run build
+```
+
+The production files are created in `dist/`.
+
+If your frontend and backend are hosted under the same domain and `/api` routes to the Azure Function, you can skip `VITE_TTS_API_BASE_URL`. MoonWave defaults to `/api`.
+
+## Useful Commands
+
+```sh
+npm install
+npm run api:start
+npm run dev
+npm test
+npm run build
+npm run preview
+```
+
+## Troubleshooting
+
+### Backend Does Not Say Ready
+
+Check that the backend is running:
+
+```text
+http://localhost:7071/api/health
+```
+
+If that page does not load, restart the backend:
+
+```sh
+npm run api:start
+```
+
+### `func` Is Not Recognized
+
+Install Azure Functions Core Tools v4, close your terminal, reopen it, and run:
+
+```sh
+func --version
+```
+
+If that command works, try:
+
+```sh
+npm run api:start
+```
+
+### Text To Speech Does Not Work
+
+Check that:
+
+- `local.settings.json` exists
+- `AZURE_SPEECH_KEY` is filled in
+- `AZURE_SPEECH_REGION` is filled in
+- The backend terminal is still running
+- The frontend terminal is still running
+
+### Project Folder Saving Is Unavailable
+
+Use Chrome or Edge. MoonWave uses the File System Access API for project folders, and not every browser supports it.
+
+### Is My Azure Key Safe?
+
+Yes, as long as you keep it in `local.settings.json` locally or Azure Function App settings in production.
+
+Do not put your Azure key in browser settings, screenshots, GitHub issues, commits, or README files.
+
+## Safe GitHub Checklist
+
+Before pushing your own copy to GitHub:
+
+- Commit `local.settings.example.json`.
+- Do not commit `local.settings.json`.
+- Do not commit `.env` files.
+- Do not commit generated audio unless you intentionally want it public.
+- Do not paste your Azure key into code, screenshots, issues, commits, or docs.
+
+## Tech Stack
+
+- React
+- Vite
+- Azure Functions
+- Azure Speech REST API
+- Tailwind CSS
+- Framer Motion
+- lucide-react
+
+## Official References
+
+- [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local)
+- [Deploy Azure Functions from Visual Studio Code](https://learn.microsoft.com/en-us/azure/azure-functions/how-to-create-function-vs-code)
+- [Azure Speech REST text-to-speech](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/rest-text-to-speech)
+- [Azure Speech regions](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/regions)

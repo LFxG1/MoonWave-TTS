@@ -1,9 +1,229 @@
 // A curated catalogue of popular Azure Neural voices.
-// `styles` lists the express-as speaking styles each voice officially supports.
-// (Voices with an empty styles array only support the neutral/default delivery.)
+// `styles` lists the express-as speaking styles available in MoonWave's UI.
+// Dragon HD/Omni styles are curated from Azure's HD voice docs because the
+// live voices/list endpoint can return an empty StyleList for those voices.
+
+export const DRAGON_HD_STYLES = [
+  'amazed',
+  'amused',
+  'angry',
+  'annoyed',
+  'anxious',
+  'appreciative',
+  'calm',
+  'cautious',
+  'concerned',
+  'confident',
+  'confused',
+  'curious',
+  'defeated',
+  'defensive',
+  'defiant',
+  'determined',
+  'disappointed',
+  'disgusted',
+  'doubtful',
+  'ecstatic',
+  'encouraging',
+  'excited',
+  'fast',
+  'fearful',
+  'frustrated',
+  'happy',
+  'hesitant',
+  'hurt',
+  'impatient',
+  'impressed',
+  'intrigued',
+  'joking',
+  'laughing',
+  'optimistic',
+  'painful',
+  'panicked',
+  'panting',
+  'pleading',
+  'proud',
+  'quiet',
+  'reassuring',
+  'reflective',
+  'relieved',
+  'remorseful',
+  'resigned',
+  'sad',
+  'sarcastic',
+  'secretive',
+  'serious',
+  'shocked',
+  'shouting',
+  'shy',
+  'skeptical',
+  'slow',
+  'struggling',
+  'surprised',
+  'suspicious',
+  'sympathetic',
+  'terrified',
+  'upset',
+  'urgent',
+  'whispering',
+];
 
 export const VOICES = [
   // English (US)
+  {
+    id: 'en-US-Ava:DragonHDOmniLatestNeural',
+    name: 'Ava Omni HD',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Female',
+    styles: DRAGON_HD_STYLES,
+    recommended: true,
+    badge: 'Omni',
+    supportsStylePrompt: true,
+    supportsHdParameters: true,
+  },
+  {
+    id: 'en-US-Andrew:DragonHDOmniLatestNeural',
+    name: 'Andrew Omni HD',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Male',
+    styles: DRAGON_HD_STYLES,
+    recommended: true,
+    badge: 'Omni',
+    supportsStylePrompt: true,
+    supportsHdParameters: true,
+  },
+  {
+    id: 'en-US-Emma:DragonHDLatestNeural',
+    name: 'Emma Dragon HD',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Female',
+    styles: DRAGON_HD_STYLES,
+    recommended: true,
+    badge: 'HD',
+  },
+  {
+    id: 'en-US-Andrew:DragonHDLatestNeural',
+    name: 'Andrew Dragon HD',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Male',
+    styles: DRAGON_HD_STYLES,
+    recommended: true,
+    badge: 'HD',
+  },
+  {
+    id: 'en-US-Ava:DragonHDLatestNeural',
+    name: 'Ava Dragon HD',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Female',
+    styles: DRAGON_HD_STYLES,
+    recommended: true,
+    badge: 'HD',
+  },
+  {
+    id: 'en-US-Brian:DragonHDLatestNeural',
+    name: 'Brian Dragon HD',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Male',
+    styles: DRAGON_HD_STYLES,
+    recommended: true,
+    badge: 'HD',
+  },
+  {
+    id: 'en-US-Steffan:DragonHDLatestNeural',
+    name: 'Steffan Dragon HD',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Male',
+    styles: DRAGON_HD_STYLES,
+    recommended: true,
+    badge: 'HD',
+  },
+  {
+    id: 'en-US-EmmaMultilingualNeural',
+    name: 'Emma (Multilingual)',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Female',
+    styles: [],
+    recommended: true,
+    badge: 'Recommended',
+  },
+  {
+    id: 'en-US-AndrewMultilingualNeural',
+    name: 'Andrew (Multilingual)',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Male',
+    styles: ['empathetic', 'relieved'],
+    recommended: true,
+    badge: 'Recommended',
+  },
+  {
+    id: 'en-US-AvaMultilingualNeural',
+    name: 'Ava (Multilingual)',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Female',
+    styles: [],
+    recommended: true,
+    badge: 'Recommended',
+  },
+  {
+    id: 'en-US-BrianMultilingualNeural',
+    name: 'Brian (Multilingual)',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Male',
+    styles: [],
+    recommended: true,
+    badge: 'Recommended',
+  },
+  {
+    id: 'en-US-SerenaMultilingualNeural',
+    name: 'Serena (Multilingual)',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Female',
+    styles: ['empathetic', 'excited', 'friendly', 'shy', 'serious', 'relieved', 'sad'],
+    recommended: true,
+    badge: 'Recommended',
+  },
+  {
+    id: 'en-US-DavisMultilingualNeural',
+    name: 'Davis (Multilingual)',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Male',
+    styles: ['empathetic', 'funny', 'relieved'],
+    recommended: true,
+    badge: 'Recommended',
+  },
+  {
+    id: 'en-US-SteffanMultilingualNeural',
+    name: 'Steffan (Multilingual)',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Male',
+    styles: [],
+    recommended: true,
+    badge: 'Recommended',
+  },
+  {
+    id: 'en-US-NancyMultilingualNeural',
+    name: 'Nancy (Multilingual)',
+    locale: 'en-US',
+    localeName: 'English (US)',
+    gender: 'Female',
+    styles: ['excited', 'friendly', 'funny', 'relieved', 'shy'],
+    recommended: true,
+    badge: 'Recommended',
+  },
   {
     id: 'en-US-AriaNeural',
     name: 'Aria',
@@ -62,30 +282,6 @@ export const VOICES = [
       'shouting',
       'whispering',
     ],
-  },
-  {
-    id: 'en-US-DavisNeural',
-    name: 'Davis',
-    locale: 'en-US',
-    localeName: 'English (US)',
-    gender: 'Male',
-    styles: ['chat', 'cheerful', 'friendly', 'hopeful', 'excited', 'sad', 'angry', 'whispering'],
-  },
-  {
-    id: 'en-US-AndrewMultilingualNeural',
-    name: 'Andrew (Multilingual)',
-    locale: 'en-US',
-    localeName: 'English (US)',
-    gender: 'Male',
-    styles: [],
-  },
-  {
-    id: 'en-US-AvaMultilingualNeural',
-    name: 'Ava (Multilingual)',
-    locale: 'en-US',
-    localeName: 'English (US)',
-    gender: 'Female',
-    styles: [],
   },
   {
     id: 'en-US-EmmaNeural',
@@ -229,8 +425,56 @@ export function getVoicesByLocale(locale) {
   return VOICES.filter((voice) => voice.locale === locale);
 }
 
+export function getRecommendedVoicesByLocale(locale) {
+  return VOICES.filter((voice) => voice.locale === locale && voice.recommended);
+}
+
+export function getStandardVoicesByLocale(locale) {
+  return VOICES.filter((voice) => voice.locale === locale && !voice.recommended);
+}
+
 export function getVoiceById(id) {
   return VOICES.find((voice) => voice.id === id) || null;
+}
+
+export function isDragonHdVoice(voiceOrId) {
+  const id = typeof voiceOrId === 'string' ? voiceOrId : voiceOrId?.id;
+  return /:DragonHD(?:Omni)?LatestNeural$/i.test(id || '');
+}
+
+export function isDragonOmniVoice(voiceOrId) {
+  const id = typeof voiceOrId === 'string' ? voiceOrId : voiceOrId?.id;
+  return /:DragonHDOmniLatestNeural$/i.test(id || '');
+}
+
+export function supportsStylePrompt(voiceOrId) {
+  const voice = typeof voiceOrId === 'string' ? getVoiceById(voiceOrId) : voiceOrId;
+  return Boolean(voice?.supportsStylePrompt);
+}
+
+export function supportsHdParameters(voiceOrId) {
+  const voice = typeof voiceOrId === 'string' ? getVoiceById(voiceOrId) : voiceOrId;
+  return Boolean(voice?.supportsHdParameters);
+}
+
+export function getVoiceStyles(voiceOrId) {
+  const voice = typeof voiceOrId === 'string' ? getVoiceById(voiceOrId) : voiceOrId;
+  return Array.isArray(voice?.styles) ? voice.styles : [];
+}
+
+export function getVoiceLanguageCount(voiceOrId) {
+  const voice = typeof voiceOrId === 'string' ? getVoiceById(voiceOrId) : voiceOrId;
+  if (!voice) return 0;
+  if (Number.isFinite(voice.languageCount)) return voice.languageCount;
+  if (voice.id.includes('Multilingual') || isDragonOmniVoice(voice)) return getLocales().length;
+  return 1;
+}
+
+export function getVoiceLanguageLabel(voiceOrId) {
+  const count = getVoiceLanguageCount(voiceOrId);
+  if (!count) return 'No languages';
+  if (count === 1) return '1 language';
+  return `${count} library languages`;
 }
 
 /** Turn an Azure style id like "narration-professional" into "Narration Professional". */

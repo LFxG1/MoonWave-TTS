@@ -13,6 +13,7 @@ export default function VoiceLibraryPanel({ onUseVoice, currentVoiceId }) {
         voice.name.toLowerCase().includes(q) ||
         voice.localeName.toLowerCase().includes(q) ||
         voice.locale.toLowerCase().includes(q) ||
+        voice.badge?.toLowerCase().includes(q) ||
         voice.styles.some((style) => style.includes(q))
     );
   }, [query]);
@@ -31,7 +32,7 @@ export default function VoiceLibraryPanel({ onUseVoice, currentVoiceId }) {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by name, language, or style…"
+          placeholder="Search by name, language, HD, or style..."
           className="w-full rounded-xl border border-slate-200 bg-white/80 py-2.5 pl-11 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus-ring"
         />
       </div>
@@ -47,21 +48,34 @@ export default function VoiceLibraryPanel({ onUseVoice, currentVoiceId }) {
               }`}
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#eef3ff] text-[#5b8def]">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#eef3ff] text-[#5b8def]">
                     <Mic size={18} />
                   </span>
-                  <div>
-                    <p className="font-medium text-slate-800">{voice.name}</p>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-medium text-slate-800">{voice.name}</p>
+                      {voice.badge && (
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
+                            voice.badge === 'HD'
+                              ? 'bg-[#eaf1ff] text-[#3068d6]'
+                              : 'bg-emerald-50 text-emerald-600'
+                          }`}
+                        >
+                          {voice.badge}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-slate-500">
-                      {voice.localeName} · {voice.gender}
+                      {voice.localeName} - {voice.gender}
                     </p>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => onUseVoice(voice)}
-                  className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors focus-ring ${
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors focus-ring ${
                     active
                       ? 'bg-moon-gradient text-white shadow-[0_6px_16px_-6px_rgba(91,141,239,0.8)]'
                       : 'bg-slate-100 text-slate-600 hover:bg-[#eaf1ff] hover:text-[#3068d6]'
@@ -95,7 +109,7 @@ export default function VoiceLibraryPanel({ onUseVoice, currentVoiceId }) {
       </div>
 
       {filtered.length === 0 && (
-        <p className="py-10 text-center text-sm text-slate-400">No voices match “{query}”.</p>
+        <p className="py-10 text-center text-sm text-slate-400">No voices match "{query}".</p>
       )}
     </div>
   );

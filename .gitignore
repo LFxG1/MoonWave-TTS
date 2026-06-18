@@ -9,12 +9,19 @@ dist-ssr/
 .env
 .env.local
 .env.*.local
+local.settings.json
 
 # Logs
+.logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# Local browser/test artifacts
+.cursor/
+.playwright-cli/
+output/
 
 # Editor / OS
 .vscode/*
